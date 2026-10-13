@@ -1,0 +1,55 @@
+{
+  "name": "@forumulate/sdk",
+  "version": "0.3.0",
+  "description": "Typed TypeScript client for the Forumulate REST API.",
+  "license": "MIT",
+  "homepage": "https://forumulate.com/reference",
+  "bugs": {
+    "url": "https://forumulate.com/community"
+  },
+  "keywords": [
+    "forumulate",
+    "docs",
+    "documentation",
+    "api",
+    "sdk",
+    "typescript",
+    "openapi",
+    "knowledge-base",
+    "forum"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit --incremental --tsBuildInfoFile node_modules/.cache/tsc-src.tsbuildinfo && tsc -p tsconfig.test.json --incremental --tsBuildInfoFile node_modules/.cache/tsc-test.tsbuildinfo",
+    "test": "vitest run",
+    "prepublishOnly": "npm run build",
+    "generate-schema": "npx -y openapi-typescript@7 openapi.json -o src/schema.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  },
+  "author": "Forumulate",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/forumulate/forumulate-js.git"
+  }
+}

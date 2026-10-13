@@ -1,0 +1,8 @@
+{
+  // The build config excludes tests because it emits; they still need checking.
+  // A changed signature otherwise breaks them silently.
+  "extends": "./tsconfig.json",
+  "compilerOptions": { "noEmit": true, "rootDir": "." },
+  "include": ["src", "test"],
+  "exclude": ["dist", "node_modules"]
+}
