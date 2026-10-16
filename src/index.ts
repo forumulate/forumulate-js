@@ -1,9 +1,11 @@
 export * from './types';
 export { verifyWebhookSignature, type VerifyWebhookInput } from './webhooks';
+export * from './content';
 export type { paths } from './schema';
 export type { HttpMethod, MethodsOf, OperationOf, TypedRequestInit, TypedResponse } from './typed';
 import type { paths } from './schema';
 import type { HttpMethod, TypedRequestInit, TypedResponse } from './typed';
+import { contentApi } from './content';
 import type {
   Organization,
   Space,
@@ -252,6 +254,9 @@ export class ForumulateClient {
         body: input,
       }),
   };
+
+  // ── Content libraries (headless CMS) — see ./content ───────────────────────
+  readonly content = contentApi((method, path, opts) => this.request(method, path, opts));
 
   // ── Organizations ─────────────────────────────────────────────────────────
   readonly orgs = {
