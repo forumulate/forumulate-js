@@ -62,7 +62,7 @@ type ParamsPart<Op> = Op extends { parameters: { path: infer P } }
  * property adds, so `HasKeys` sees the object rather than a union with
  * `undefined` (which would otherwise always look like it has keys).
  */
-type QueryPart<Op> = Op extends { parameters: { query: infer Q } }
+export type QueryPart<Op> = Op extends { parameters: { query: infer Q } }
   ? HasKeys<NonNullable<Q>> extends true
     ? { query: NonNullable<Q> }
     : { query?: undefined }
@@ -84,7 +84,7 @@ type BodyPart<Op> = Op extends { requestBody: { content: { 'application/json': i
     : { body?: undefined };
 
 /** Flatten an intersection into a single object literal for readable hovers. */
-type Simplify<T> = { [K in keyof T]: T[K] } & {};
+export type Simplify<T> = { [K in keyof T]: T[K] } & {};
 
 /**
  * The `init` argument for `typed(method, path, init)`, derived from the route:

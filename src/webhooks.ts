@@ -109,6 +109,25 @@ export async function verifyWebhookSignature(input: VerifyWebhookInput): Promise
   return false;
 }
 
+/**
+ * Verify a delivery, then parse it — the one call a webhook handler needs.
+ *
+ * Throws instead of returning `false` so the parse can never run ahead of the
+ * check: a handler that did `JSON.parse(body)` first and verified second has
+ * already acted on whatever it was sent.
+ */
+export async function constructWebhookEvent<T = Record<string, unknown>>(
+  input: VerifyWebhookInput,
+): Promise<T> {
+  if (!(await verifyWebhookSignature(input))) {
+    throw new Error(
+      'Forumulate webhook signature did not verify (wrong secret, altered body, or too old)',
+    );
+  }
+  const body = typeof input.body === 'string' ? input.body : new TextDecoder().decode(input.body);
+  return JSON.parse(body) as T;
+}
+
 /** The substring of `haystack` at `needle`'s position, for a constant-time compare. */
 function extractMatch(haystack: string, needle: string): string {
   const at = haystack.indexOf(needle);

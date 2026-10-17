@@ -1,6 +1,6 @@
 {
   "name": "@forumulate/sdk",
-  "version": "0.5.0",
+  "version": "0.7.0",
   "description": "Typed TypeScript client for the Forumulate REST API.",
   "license": "MIT",
   "homepage": "https://forumulate.com/reference",
@@ -20,6 +20,7 @@
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "sideEffects": false,
   "files": [
     "dist",
     "!dist/**/*.map",
@@ -31,10 +32,11 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit --incremental --tsBuildInfoFile node_modules/.cache/tsc-src.tsbuildinfo && tsc -p tsconfig.test.json --incremental --tsBuildInfoFile node_modules/.cache/tsc-test.tsbuildinfo",
     "test": "vitest run",
     "prepublishOnly": "npm run build",
-    "generate-schema": "npx -y openapi-typescript@7 openapi.json -o src/schema.ts"
+    "generate-schema": "npx -y openapi-typescript@7 openapi.json -o src/schema.ts && node scripts/generate-operations.mjs",
+    "generate-operations": "node scripts/generate-operations.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit --incremental --tsBuildInfoFile node_modules/.cache/tsc-src.tsbuildinfo && tsc -p tsconfig.test.json --incremental --tsBuildInfoFile node_modules/.cache/tsc-test.tsbuildinfo"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",
