@@ -1,6 +1,6 @@
 {
   "name": "@forumulate/sdk",
-  "version": "0.7.0",
+  "version": "0.11.0",
   "description": "Typed TypeScript client for the Forumulate REST API.",
   "license": "MIT",
   "homepage": "https://forumulate.com/reference",
@@ -25,6 +25,7 @@
     "dist",
     "!dist/**/*.map",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "publishConfig": {

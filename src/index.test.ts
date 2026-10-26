@@ -33,11 +33,19 @@ function harness(responses: Array<{ status?: number; body: unknown }>) {
 
 describe('ForumulateClient', () => {
   it('sends bearer auth and parses the response', async () => {
+    // A namespace method always states a `Forumulate-Version` (API_VERSION),
+    // so the answer is the versioned envelope: rows under `data`, with `page`.
+    // From 2027-01-01 the named `orgs` key is gone, which is why it is optional.
     const { client, calls } = harness([
-      { body: { orgs: [{ id: 'o1', name: 'Acme', slug: 'acme' }] } },
+      {
+        body: {
+          data: [{ id: 'o1', name: 'Acme', slug: 'acme' }],
+          page: { limit: 50, hasMore: false, nextCursor: null },
+        },
+      },
     ]);
     const res = await client.orgs.list();
-    expect(res.orgs[0]!.slug).toBe('acme');
+    expect(res.data[0]!.slug).toBe('acme');
     expect(calls[0]!.url).toBe('http://api.test/orgs');
     expect(calls[0]!.headers.Authorization).toBe('Bearer pat_abc');
   });

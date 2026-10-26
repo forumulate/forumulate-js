@@ -2,6 +2,11 @@ export * from './types';
 export { verifyWebhookSignature, constructWebhookEvent, type VerifyWebhookInput } from './webhooks';
 export * from './content';
 export * from './translations';
+export * from './policies';
+export * from './cache';
+export * from './policy-tokens';
+export * from './policy-tickets';
+export * from './policy-feed';
 export type { paths, operations } from './schema';
 export type { HttpMethod, MethodsOf, OperationOf, TypedRequestInit, TypedResponse } from './typed';
 export {
@@ -28,6 +33,8 @@ import type { paths } from './schema';
 import type { HttpMethod, TypedRequestInit, TypedResponse } from './typed';
 import { contentApi } from './content';
 import { translationsApi } from './translations';
+import { policiesApi } from './policies';
+import { cacheApi } from './cache';
 import { send, SDK_VERSION, type Query, type Transport } from './http';
 import { pagePromise } from './pagination';
 import { positionalHelpers, type PositionalHelpers } from './helpers';
@@ -101,7 +108,7 @@ export interface ForumulateClientOptions {
   userAgent?: string;
 }
 
-type HandWritten = keyof PositionalHelpers | 'content';
+type HandWritten = keyof PositionalHelpers | 'content' | 'policies' | 'cache';
 
 /**
  * Typed client for the Forumulate REST API.
@@ -350,6 +357,20 @@ export class ForumulateClient {
   );
   /** Translations of every kind of piece, routed by space type — see ./translations. */
   readonly translations = translationsApi((method, path, opts) => this.http(method, path, opts));
+  /** The policy acceptance gate: status, accept, claim, verify, the feed — see ./policies. */
+  readonly policies = policiesApi(
+    (method, path, opts = {}) =>
+      send(this.transport, { method, path, ...opts, version: this.apiVersion }),
+    () => this.transport.baseUrl,
+  );
+  /** `cache.purge({ orgId, space, page })` over the generated `Cache_*` methods (FMU-B04). */
+  // Merged by hand rather than through `ns`: the hand-written half names every
+  // Cache_* operation itself, so the client type does not depend on the
+  // generated table having been refreshed first (the build runs before it).
+  readonly cache = mergeNamespace(
+    buildNamespace('cache' as never, this.invoke),
+    cacheApi((method, path) => this.http(method, path)) as Record<string, unknown>,
+  ) as unknown as ReturnType<typeof cacheApi>;
   readonly orgs = this.ns('orgs', this.helpers.orgs);
   readonly spaces = this.ns('spaces', this.helpers.spaces);
   readonly shapes = this.ns('shapes', this.helpers.shapes);

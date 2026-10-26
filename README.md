@@ -192,6 +192,45 @@ const es = await client.translations.get(orgId, spaceId, pageId, 'es'); // { tit
 await client.translations.put(orgId, spaceId, pageId, 'es', { markdown: '…', published: true });
 ```
 
+### 7. Gate sign-up and sign-in on your published policies
+
+`client.policies` and three standalone functions are the server half of the
+[policy acceptance gate](https://forumulate.com/guides/policy-acceptance-gate): your Legal space's
+published Terms, Privacy Policy and so on, accepted by your users in any app, whatever signs them in.
+
+```ts
+import { ForumulateClient, signPolicyTicket, verifyAcceptanceToken, policyGatePageUrl } from '@forumulate/sdk';
+
+const client = ForumulateClient.fromEnv();
+const space = { orgId: process.env.FORUMULATE_ORG!, spaceId: process.env.FORUMULATE_LEGAL_SPACE! };
+
+// What does this user still have to accept before signing in?
+const status = await client.policies.status({ ...space, subject: user.id, event: 'sign_in' });
+
+if (!status.satisfied) {
+  // Send them to the hosted acceptance page with a ticket you sign yourself (no API call).
+  const ticket = await signPolicyTicket(
+    { ...space, subject: user.id, event: 'sign_in', returnUrl: 'https://app.example.com/policy/return' },
+    process.env.FORUMULATE_POLICY_GATE_KEYS!, // "pgk_…:pgs_…"
+  );
+  return redirect(policyGatePageUrl({ ...space, ticket }));
+}
+
+// On the way back (or from the widget): verify the acceptance token offline, with key rotation.
+const r = await verifyAcceptanceToken(token, {
+  keys: process.env.FORUMULATE_POLICY_GATE_KEYS,
+  subject: user.id,
+  requireSatisfied: true,
+});
+```
+
+Also `client.policies.accept` / `claim` / `verify` / `acceptances` / `export` / `erase`, and
+`client.policies.list({ spaceId, secret })` to read Forumulate policy feed v1.
+`verifyPolicyWebhook(headers, rawBody, secret)` checks a `policy.published` / `policy.retired`
+notice, and `signPolicyFeedRequest` / `verifyPolicyFeedRequest` implement the feed's request
+signing, so any platform can consume the feed or serve its own. Recipes for Auth0, Clerk, Supabase,
+Firebase, Auth.js and a custom backend: [Policy gate recipes](https://forumulate.com/guides/policy-gate-recipes).
+
 ## Every endpoint: `typed()`
 
 The helpers above cover the common paths. `typed(method, path, init)` covers every route in the OpenAPI spec, with the path, params, query, body and response all inferred, and autocomplete on path and method:
@@ -254,7 +293,7 @@ Each call also takes `headers`, `signal` (an `AbortSignal`) and `maxRetries`.
 new ForumulateClient({
   baseUrl: 'https://forumulate.com/api',
   token,
-  apiVersion: '2026-12-01', // Forumulate-Version for every request (default: generated methods only)
+  apiVersion: '2027-02-01', // Forumulate-Version for every request (default: generated methods only)
   maxRetries: 2, // 0 turns retries off
   autoIdempotencyKey: true, // generated Idempotency-Key on POST/PATCH
   userAgent: 'my-app/1.0', // default forumulate-sdk-js/<version> outside a browser

@@ -67,6 +67,7 @@ Translation docs.translations|Import docs.import|OpenApi openapi|SdkPublishing o
 Webhook webhooks|Notification notifications|Push notifications.push
 Mail mail|Unsubscribe mail.unsubscribe|EmailTemplates mail.templates|Newsletter newsletter
 Asset assets|Domain domains|AcmeChallenge domains.acme
+Cache cache|EdgeProvider cache.providers|PublishRun pages.publishRuns
 Blog blog|Forum forum|Automation forum.automations|Roadmap roadmap
 Community community|Extras community.extras|Reputation community.reputation|CannedReply community.cannedReplies
 Relationship community.relationships|ComposerDraft community.drafts|CustomEmoji community.customEmoji
