@@ -1,6 +1,6 @@
 {
   "name": "@forumulate/sdk",
-  "version": "0.13.1",
+  "version": "0.13.2",
   "description": "Typed TypeScript client for the Forumulate REST API.",
   "license": "MIT",
   "homepage": "https://forumulate.com/reference",

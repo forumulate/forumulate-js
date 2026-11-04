@@ -7,7 +7,7 @@
  */
 
 /** Kept in step with package.json by `coverage.test.ts`. */
-export const SDK_VERSION = '0.13.1';
+export const SDK_VERSION = '0.13.2';
 
 /** The API's error envelope: `{ error: { code, message, details? }, requestId? }`. */
 export interface ForumulateErrorInit {

@@ -78613,6 +78613,8 @@ export interface components {
                     /** @constant */
                     version?: "bump";
                 }[];
+                /** @description One sentence about the space (up to 300 characters): the description search engines and social cards show. Shorthand for `seo.description` (the same stored value, kept in step on every apply); naming both with different text is refused. */
+                description?: string;
             }[];
             sources?: {
                 spaceId?: string | null;

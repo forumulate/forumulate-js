@@ -3,6 +3,14 @@
 Releases of `@forumulate/sdk`. Earlier versions are described in the git history of
 `packages/sdk` (`release(sdk): …` commits).
 
+## 0.13.2
+
+- An authenticated write now refuses a query parameter it does not read: `400`
+  `request.malformed`, `reason: "unknown_parameter"`, `param` naming it. Nothing is
+  written. `dryRun` / `dry_run` / `dryrun` still plan, and link tags (`utm_*`) pass.
+- Manifest `spaces[].description`: one sentence about the space, shorthand for
+  `seo.description`.
+
 ## 0.13.1
 
 - Types for the 2026-11-04 batch: the manifest's `readerAuth` is described (its three
