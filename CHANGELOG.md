@@ -3,6 +3,34 @@
 Releases of `@forumulate/sdk`. Earlier versions are described in the git history of
 `packages/sdk` (`release(sdk): …` commits).
 
+## 0.12.1
+
+- A CSV export over the API's row threshold answers `202` with a job instead of the
+  file. Every `exportCsv` (and any GET that answers 202 with an `export.csv` job) now
+  waits for the job and returns the file, the same as the `200`; a failed job throws
+  `ForumulateError` with the job's error, and 30 minutes without a result throws
+  `export.timeout`. Pass `raw: true` to get the `202` itself.
+
+## 0.12.0
+
+Types and operations for the 2026-11-01 batch: connector `knowledge` state and the token
+response, monitor `headers` / `headersSet` / `json`, domain `settling` and manifest
+`domains[].state`, `readerIdentity`, `releases`, `legalDocuments`, page
+`metadata.frontMatter`, consent `webhookLastFailure`, `DELETE /orgs/{orgId}/members`
+by external id, `POST …/reader-auth/jwt/check`, `POST …/reader-sessions/revoke`, and the
+external_jwt `testVector` on reader-auth setup.
+
+## 0.11.4
+
+### Added
+- Types and operations for export jobs (`GET /orgs/{orgId}/exports/{id}` and its
+  `/download`), `?nav=lean|lean-all|lean-listing` on the public space and site
+  overviews, and `GET /public/orgs/{org}/spaces/{space}/nav/{nodeId}/children`.
+
+### Changed
+- A CSV export past 20,000 rows answers `202` with the job; `exportCsv()` returns
+  that job (follow `links.result` once it completes) instead of the CSV text.
+
 ## 0.11.0
 
 Every settings object writable by PATCH, site-level settings, a whole site from one manifest, and stable method names.

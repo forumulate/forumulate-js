@@ -7,7 +7,7 @@
  */
 
 /** Kept in step with package.json by `coverage.test.ts`. */
-export const SDK_VERSION = '0.11.0';
+export const SDK_VERSION = '0.13.0';
 
 /** The API's error envelope: `{ error: { code, message, details? }, requestId? }`. */
 export interface ForumulateErrorInit {
@@ -266,7 +266,14 @@ export async function send<T>(t: Transport, init: SendInit): Promise<T> {
       await sleep(wait, init.signal);
       continue;
     }
-    if (res.ok) return (await decode(res, init)) as T;
+    if (res.ok) {
+      if (res.status === 202 && method === 'GET' && !init.raw && init.kind !== 'binary') {
+        const job = (await decode(res, { ...init, kind: 'json' })) as QueuedExport | undefined;
+        if (job?.kind === 'export.csv' && job.links?.self) return (await followExport(t, init, job)) as T;
+        return job as T;
+      }
+      return (await decode(res, init)) as T;
+    }
     if (attempt < maxRetries && RETRY_STATUS.has(res.status)) {
       const wait = retryDelayMs(attempt, res.headers?.get?.('retry-after'));
       if (wait !== null) {
@@ -277,4 +284,41 @@ export async function send<T>(t: Transport, init: SendInit): Promise<T> {
     }
     throw await toError(res);
   }
+}
+
+interface QueuedExport {
+  kind?: string;
+  state?: string;
+  error?: { code?: string; message?: string } | null;
+  links?: { self?: string; result?: string | null };
+}
+
+/** An absolute or `/api`-prefixed link from the API, as a path under the client's base URL. */
+const apiPath = (link: string) => link.replace(/^https?:\/\/[^/]+/, '').replace(/^\/api(?=\/)/, '');
+
+/** How long a queued export is waited for before giving up (the file is kept 7 days). */
+export const EXPORT_WAIT_MS = 30 * 60_000;
+
+/**
+ * A CSV export over the API's row threshold answers 202 with the job that builds
+ * the file, not the file. Every caller asked for the file, so wait for the job and
+ * fetch it: the same answer the 200 gives, however big. `raw: true` opts out.
+ */
+async function followExport(t: Transport, init: SendInit, first: QueuedExport): Promise<unknown> {
+  const base = { headers: init.headers, signal: init.signal, version: init.version, maxRetries: init.maxRetries };
+  const deadline = Date.now() + EXPORT_WAIT_MS;
+  let job = first;
+  for (let i = 0; job.state !== 'completed'; i++) {
+    if (job.state === 'failed' || job.state === 'canceled') {
+      throw new ForumulateError(500, job.error?.code ?? 'job.failed', job.error?.message ?? 'The export failed.', { body: job });
+    }
+    if (Date.now() > deadline) {
+      throw new ForumulateError(504, 'export.timeout', 'The export did not finish within 30 minutes.', { body: job });
+    }
+    await sleep(Math.min(1000 * 2 ** i, 10_000), init.signal);
+    job = await send<QueuedExport>(t, { ...base, method: 'GET', path: apiPath(job.links!.self!) });
+  }
+  const result = job.links?.result;
+  if (!result) throw new ForumulateError(500, 'job.no_result', 'The export finished without a file.', { body: job });
+  return send(t, { ...base, method: 'GET', path: apiPath(result), kind: init.kind });
 }

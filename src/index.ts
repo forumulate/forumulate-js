@@ -4,6 +4,7 @@ export * from './content';
 export * from './translations';
 export * from './policies';
 export * from './cache';
+export * from './heartbeat';
 export * from './policy-tokens';
 export * from './policy-tickets';
 export * from './policy-feed';
