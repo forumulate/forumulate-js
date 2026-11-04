@@ -3,6 +3,25 @@
 Releases of `@forumulate/sdk`. Earlier versions are described in the git history of
 `packages/sdk` (`release(sdk): …` commits).
 
+## 0.13.1
+
+- Types for the 2026-11-04 batch: the manifest's `readerAuth` is described (its three
+  forms, and that `"atlas"` keeps the live `atlas_byo` provider's order and settings),
+  and a write's `?dry_run=true` / `?dryrun=true` now plan exactly like `?dryRun=true`
+  (they were ignored and the write happened).
+- This changelog gains the 0.13.0 entry it shipped without.
+
+## 0.13.0
+
+- `startHeartbeat({ url, everyMs, check?, timeoutMs?, onError? })` keeps a heartbeat
+  monitor green from a long-running process and returns a `stop()` function. It never
+  throws and never leaks a rejected ping. A `check` that throws, or answers
+  `ok: false`, is sent as `{ ok: false, detail }`, so the status page shows a partial
+  outage in the job's own words. Each ping has its own timeout.
+- Types and operations for the 2026-11-03 batch: the compare (`/vs/`) page type,
+  careers and about page settings, space `description` and `siteId` on create, the
+  heartbeat monitor's `pingUrl`, and the `executor_key.expiring` webhook event.
+
 ## 0.12.1
 
 - A CSV export over the API's row threshold answers `202` with a job instead of the

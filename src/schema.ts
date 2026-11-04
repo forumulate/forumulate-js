@@ -78676,6 +78676,7 @@ export interface components {
                 } | null;
                 space?: string;
             }[];
+            /** @description How readers sign in, for the whole organization. Three forms: `"atlas"` — the Atlas reader provider, on the instance linked to this organization or, failing that, the live `atlas_byo` provider (whose order and settings are kept, so it plans as unchanged); `{method: "atlas", instanceId?, frontendApi?, audience?}` — the same, naming the instance (`ins_…`), a custom frontend-API domain, or an audience other than `forumulate:<orgId>`; `{providers, signInUrl?, signOutUrl?}` — the DECLARED registry: apply replaces the providers (a stored provider left out is removed) and the URLs. Do not combine with an organization-level `reader_auth` entry. Guide: https://forumulate.com/guides/reader-sign-in-with-your-app#change-a-spaces-sign-in-method. */
             readerAuth?: ("atlas" | {
                 /** @constant */
                 method: "atlas";
